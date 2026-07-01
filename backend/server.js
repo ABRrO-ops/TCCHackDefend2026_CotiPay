@@ -8,6 +8,7 @@ const cotisationsRoutes = require('./routes/cotisations');
 const adminRoutes = require('./routes/admin');
 const membresRoutes = require('./routes/membres');
 const inscriptionRoutes = require('./routes/inscription');
+const selfserviceRoutes = require('./routes/selfservice');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 // ✅ Routes
 app.use('/api/auth', authRoutes);
@@ -25,6 +27,7 @@ app.use('/api/membres', membresRoutes);
 app.use('/api/cotisations', cotisationsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/inscription', inscriptionRoutes);
+app.use('/api/selfservice', selfserviceRoutes);
 
 // ✅ Test route
 app.get('/', (req, res) => {
