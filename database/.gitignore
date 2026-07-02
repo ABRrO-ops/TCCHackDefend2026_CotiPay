@@ -1,3 +1,5 @@
+backend/uploads/* 
+!backend/uploads/.gitkeep 
 # Dump SQL avec données réelles
 *.sql
 *.backup
