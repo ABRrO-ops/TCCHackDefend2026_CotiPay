@@ -113,8 +113,8 @@ export default function Login() {
 
           <p className="text-center text-xs text-muted mt-8">
             Pas encore de compte ?{" "}
-            <Link to="/inscription" className="text-primary font-semibold hover:underline">
-              Contactez votre micro-finance
+            <Link to="/choisir-microfinance" className="text-primary font-semibold hover:underline">
+              Rejoindre une micro-finance
             </Link>
           </p>
 

@@ -6,6 +6,11 @@ import DashboardCollecteur from "./pages/DashboardCollecteur"
 import DashboardAdmin from "./pages/DashboardAdmin"
 import DemandeRetrait from "./pages/DemandeRetrait"
 import BackOffice from "./pages/BackOffice"
+import ChoisirMicrofinance from "./pages/ChoisirMicrofinance"
+import ChoisirRole from "./pages/ChoisirRole"
+import InscriptionMembre from "./pages/InscriptionMembre"
+import InscriptionCollecteur from "./pages/InscriptionCollecteur"
+import AdminInscriptions from "./pages/AdminInscriptions"
 
 function App() {
   return (
@@ -18,6 +23,11 @@ function App() {
         <Route path="/collecteur" element={<DashboardCollecteur />} />
         <Route path="/admin" element={<DashboardAdmin />} />
         <Route path="/backoffice" element={<BackOffice />} />
+        <Route path="/choisir-microfinance" element={<ChoisirMicrofinance />} />
+<Route path="/inscription-role/:microfinanceId" element={<ChoisirRole />} />
+<Route path="/inscription-membre/:microfinanceId" element={<InscriptionMembre />} />
+<Route path="/inscription-collecteur/:microfinanceId" element={<InscriptionCollecteur />} />
+<Route path="/admin/inscriptions" element={<AdminInscriptions />} />
       </Routes>
     </BrowserRouter>
   )

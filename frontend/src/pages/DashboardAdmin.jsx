@@ -70,7 +70,7 @@ export default function DashboardAdmin() {
     { id: "collecteurs", icon: Users, label: "Collecteurs" },
     { id: "membres", icon: UserPlus, label: "Membres" },
     { id: "retraits", icon: ArrowDownCircle, label: "Retraits" },
-    { id: "inscriptions", icon: ClipboardList, label: "Inscriptions" },
+    { id: "inscriptions", icon: ClipboardList, label: "Inscriptions", onClick: () => navigate("/admin/inscriptions") },
     { id: "historique", icon: History, label: "Historique" },
   ]
 
@@ -108,7 +108,7 @@ export default function DashboardAdmin() {
             {navItems.map(item => (
               <button
                 key={item.id}
-                onClick={() => setOngletActif(item.id)}
+                onClick={() => { if (item.onClick) { item.onClick() } else { setOngletActif(item.id) } }}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 text-left ${
                   ongletActif === item.id
                     ? "bg-white/15 text-white"
