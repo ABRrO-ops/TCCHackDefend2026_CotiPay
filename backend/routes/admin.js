@@ -208,4 +208,75 @@ router.get('/retraits/en-attente', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
+// GET /api/admin/membres
+router.get('/membres', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const adminId = req.user.id;
+    const adminInfo = await pool.query('SELECT microfinance_id FROM users WHERE id = $1', [adminId]);
+    const microfinanceId = adminInfo.rows[0].microfinance_id;
+    const result = await pool.query(`
+      SELECT m.id, u.nom, u.prenom, u.email, u.created_at,
+             m.solde, m.adresse, m.lieu_travail, m.telephone, m.photo_url, m.numero_compte,
+             cu.nom AS collecteur_nom, cu.prenom AS collecteur_prenom,
+             EXISTS (
+               SELECT 1 FROM cotisations c
+               WHERE c.membre_id = m.id
+               AND DATE(c.date_cotisation) = CURRENT_DATE
+               AND c.statut = 'valide'
+             ) AS cotise_aujourdhui
+      FROM membres m
+      JOIN users u ON u.id = m.user_id
+      LEFT JOIN users cu ON cu.id = m.collecteur_id
+      WHERE u.microfinance_id = $1
+      ORDER BY u.nom
+    `, [microfinanceId]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// GET /api/admin/membres/:id/cotisations
+router.get('/membres/:id/cotisations', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(`
+      SELECT date_cotisation, statut, montant
+      FROM cotisations
+      WHERE membre_id = $1
+      AND DATE_TRUNC('month', date_cotisation) = DATE_TRUNC('month', CURRENT_DATE)
+      ORDER BY date_cotisation
+    `, [id]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// GET /api/admin/collecteurs/:id/membres
+router.get('/collecteurs/:id/membres', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(`
+      SELECT m.id, u.nom, u.prenom, u.email, m.solde,
+             EXISTS (
+               SELECT 1 FROM cotisations c
+               WHERE c.membre_id = m.id
+               AND DATE(c.date_cotisation) = CURRENT_DATE
+               AND c.statut = 'valide'
+             ) AS cotise_aujourdhui
+      FROM membres m
+      JOIN users u ON u.id = m.user_id
+      WHERE m.collecteur_id = $1
+      ORDER BY u.nom
+    `, [id]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
 module.exports = router;

@@ -11,6 +11,11 @@ import {
   ResponsiveContainer, CartesianGrid
 } from "recharts"
 import AjouterUtilisateur from "../components/AjouterUtilisateur"
+import OngletCollecteurs from "../components/OngletCollecteurs"
+import OngletMembres from "../components/OngletMembres"
+import OngletRetraits from "../components/OngletRetraits"
+import OngletCotisations from "../components/OngletCotisations"
+import OngletExportCSV from "../components/OngletExportCSV"
 
 export default function DashboardAdmin() {
   const [sidebarOuverte, setSidebarOuverte] = useState(true)
@@ -70,8 +75,10 @@ export default function DashboardAdmin() {
     { id: "collecteurs", icon: Users, label: "Collecteurs" },
     { id: "membres", icon: UserPlus, label: "Membres" },
     { id: "retraits", icon: ArrowDownCircle, label: "Retraits" },
+    { id: "cotisations", icon: CheckCircle2, label: "Cotisations" },
     { id: "inscriptions", icon: ClipboardList, label: "Inscriptions", onClick: () => navigate("/admin/inscriptions") },
     { id: "historique", icon: History, label: "Historique" },
+    { id: "export", icon: Download, label: "Export CSV" },
   ]
 
   const statutBadge = (statut) => {
@@ -245,7 +252,7 @@ export default function DashboardAdmin() {
               </div>
 
               {/* Chart + Retraits */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4">
 
                 {/* Chart */}
                 <div className="col-span-2 bg-white rounded-2xl p-6 border border-gray-100">
@@ -276,6 +283,11 @@ export default function DashboardAdmin() {
                   </ResponsiveContainer>
                 </div>
 
+              </div>
+
+              {/* Retraits en attente + Dernières inscriptions */}
+              <div className="grid grid-cols-2 gap-4">
+
                 {/* Retraits en attente */}
                 <div className="bg-white rounded-2xl p-5 border border-gray-100">
                   <div className="flex items-center justify-between mb-4">
@@ -296,23 +308,15 @@ export default function DashboardAdmin() {
                             <p className="text-xs text-muted">{r.mode} · {r.date}</p>
                           </div>
                         </div>
-                        <p className="text-sm font-bold text-main mb-2">{r.montant.toLocaleString("fr-FR")} FCFA</p>
+                        <p className="text-sm font-bold text-main mb-2">{r.montant.toLocaleString('fr-FR')} FCFA</p>
                         <div className="flex gap-2">
-                          <button className="flex-1 py-1.5 bg-green-50 text-green-600 text-xs font-semibold rounded-lg hover:bg-green-100 transition-colors">
-                            Valider
-                          </button>
-                          <button className="flex-1 py-1.5 bg-red-50 text-red-500 text-xs font-semibold rounded-lg hover:bg-red-100 transition-colors">
-                            Rejeter
-                          </button>
+                          <button className="flex-1 py-1.5 bg-green-50 text-green-600 text-xs font-semibold rounded-lg hover:bg-green-100 transition-colors">Valider</button>
+                          <button className="flex-1 py-1.5 bg-red-50 text-red-500 text-xs font-semibold rounded-lg hover:bg-red-100 transition-colors">Rejeter</button>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
-
-              {/* Dernières inscriptions + Cotisations du jour */}
-              <div className="grid grid-cols-2 gap-4">
 
                 {/* Inscriptions */}
                 <div className="bg-white rounded-2xl p-5 border border-gray-100">
@@ -336,50 +340,28 @@ export default function DashboardAdmin() {
                   </div>
                 </div>
 
-                {/* Cotisations du jour */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-100">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="font-bold text-main text-sm">Cotisations du jour</p>
-                    <button className="flex items-center gap-1.5 text-primary text-xs font-semibold hover:underline">
-                      <Download size={12} /> Export CSV
-                    </button>
-                  </div>
-                  {cotisations.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-8 text-center">
-                      <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mb-2">
-                        <CheckCircle2 size={18} className="text-gray-300" />
-                      </div>
-                      <p className="text-muted text-sm">Aucune cotisation aujourd'hui</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {cotisations.slice(0, 5).map((c, i) => (
-                        <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                          <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 bg-secondary rounded-full flex items-center justify-center flex-shrink-0">
-                              <span className="text-primary text-xs font-bold">{c.nom?.charAt(0)}</span>
-                            </div>
-                            <p className="text-sm font-medium text-main">{c.nom} {c.prenom}</p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <p className="text-sm font-bold text-main">{c.montant} F</p>
-                            {c.statut === "valide"
-                              ? <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-50 text-green-600">Validé</span>
-                              : <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600">Attente</span>
-                            }
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </div>
 
             </div>
           )}
 
-          {/* Placeholder autres onglets */}
-          {ongletActif !== "dashboard" && (
+          {ongletActif === "collecteurs" && (
+            <OngletCollecteurs token={token} onAjouter={() => setModaleOuverte("collecteur")} />
+          )}
+          {ongletActif === "membres" && (
+            <OngletMembres token={token} onAjouter={() => setModaleOuverte("membre")} />
+          )}
+          {ongletActif === "retraits" && (
+            <OngletRetraits token={token} />
+          )}
+          {ongletActif === "cotisations" && (
+            <OngletCotisations token={token} cotisations={cotisations} />
+          )}
+          {ongletActif === "export" && (
+            <OngletExportCSV token={token} />
+          )}
+
+          {!["dashboard","collecteurs","membres","retraits","cotisations","export"].includes(ongletActif) && (
             <div className="flex flex-col items-center justify-center h-64 text-center">
               <div className="w-14 h-14 bg-primary/8 rounded-2xl flex items-center justify-center mb-3">
                 {(() => { const Item = navItems.find(n => n.id === ongletActif); return Item ? <Item.icon size={22} className="text-primary" /> : null })()}
@@ -388,7 +370,6 @@ export default function DashboardAdmin() {
               <p className="text-muted text-xs">Cette section sera disponible bientôt.</p>
             </div>
           )}
-
         </main>
       </div>
 
