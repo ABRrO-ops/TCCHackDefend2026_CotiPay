@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
-\restrict nZTdkQlzG0Zy4P8SswakYlSDQ3fAeMGbtmFGW0QDqekBJtWSbMAM5MLXZqXq6QO
+\restrict ZtJVJbB7C8yJWhJhSsKs9aInjCQLIaTdPgvoyPRhC7mWU58Dbs8x5Nc7XnKuZXT
 
--- Dumped from database version 18.4
--- Dumped by pg_dump version 18.4
+-- Dumped from database version 17.10
+-- Dumped by pg_dump version 17.10
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -203,7 +203,13 @@ CREATE TABLE public.membres (
     montant_cotisation numeric(10,2) DEFAULT 0,
     solde numeric(10,2) DEFAULT 0,
     collecteur_id integer,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    adresse character varying(150),
+    lieu_travail character varying(100),
+    ville_village character varying(50),
+    telephone character varying(20),
+    photo_url character varying(255),
+    numero_compte character varying(30)
 );
 
 
@@ -274,6 +280,45 @@ ALTER SEQUENCE public.microfinances_id_seq OWNED BY public.microfinances.id;
 
 
 --
+-- Name: profils_collecteurs; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.profils_collecteurs (
+    id integer NOT NULL,
+    user_id integer,
+    lieu_travail_avant character varying(100),
+    date_naissance date,
+    photo_url character varying(255),
+    cv_url character varying(255),
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.profils_collecteurs OWNER TO postgres;
+
+--
+-- Name: profils_collecteurs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.profils_collecteurs_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.profils_collecteurs_id_seq OWNER TO postgres;
+
+--
+-- Name: profils_collecteurs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.profils_collecteurs_id_seq OWNED BY public.profils_collecteurs.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -286,7 +331,9 @@ CREATE TABLE public.users (
     role character varying(20) NOT NULL,
     microfinance_id integer,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT users_role_check CHECK (((role)::text = ANY ((ARRAY['admin'::character varying, 'collecteur'::character varying, 'membre'::character varying])::text[])))
+    statut character varying(20) DEFAULT 'active'::character varying,
+    CONSTRAINT users_role_check CHECK (((role)::text = ANY ((ARRAY['admin'::character varying, 'collecteur'::character varying, 'membre'::character varying, 'super_admin'::character varying])::text[]))),
+    CONSTRAINT users_statut_check CHECK (((statut)::text = ANY ((ARRAY['en_attente'::character varying, 'active'::character varying, 'rejete'::character varying])::text[])))
 );
 
 
@@ -357,6 +404,13 @@ ALTER TABLE ONLY public.microfinances ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: profils_collecteurs id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.profils_collecteurs ALTER COLUMN id SET DEFAULT nextval('public.profils_collecteurs_id_seq'::regclass);
+
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -368,9 +422,28 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 COPY public.cotisations (id, membre_id, montant, statut, date_cotisation, heure_validation, collecteur_id, created_at, initiee_par, mode_paiement) FROM stdin;
-1	1	5000.00	valide	2026-01-05	\N	2	2026-06-06 13:13:48.991802	collecteur	\N
-2	1	5000.00	valide	2026-02-05	\N	2	2026-06-06 13:13:48.991802	collecteur	\N
-3	1	5000.00	attente	2026-03-05	\N	2	2026-06-06 13:13:48.991802	collecteur	\N
+1	1	2000.00	valide	2026-06-06	\N	\N	2026-06-06 13:49:16.68413	collecteur	\N
+2	2	5000.00	valide	2026-06-06	\N	\N	2026-06-06 22:45:15.38967	collecteur	\N
+11	1	2000.00	valide	2026-06-18	\N	\N	2026-06-18 00:01:38.012054	collecteur	\N
+12	2	5000.00	valide	2026-06-18	\N	\N	2026-06-18 00:01:44.402752	collecteur	\N
+13	3	1000.00	valide	2026-06-18	\N	\N	2026-06-18 09:26:46.795722	collecteur	\N
+14	1	2000.00	valide	2026-06-19	\N	\N	2026-06-19 18:48:15.516877	collecteur	\N
+15	2	5000.00	valide	2026-06-19	\N	\N	2026-06-19 18:48:30.140826	collecteur	\N
+16	1	2000.00	valide	2026-06-23	2026-06-23 00:42:52.965844	\N	2026-06-23 00:42:52.965844	collecteur	\N
+17	2	5000.00	valide	2026-06-23	2026-06-23 00:42:54.586806	\N	2026-06-23 00:42:54.586806	collecteur	\N
+18	3	1000.00	valide	2026-06-23	2026-06-23 00:42:55.764246	\N	2026-06-23 00:42:55.764246	collecteur	\N
+19	1	2000.00	valide	2026-06-24	2026-06-24 22:51:01.315203	\N	2026-06-24 22:51:01.315203	collecteur	\N
+20	2	5000.00	valide	2026-06-24	2026-06-24 22:51:07.625969	\N	2026-06-24 22:51:07.625969	collecteur	\N
+21	3	1000.00	valide	2026-06-24	2026-06-24 22:51:13.569169	\N	2026-06-24 22:51:13.569169	collecteur	\N
+22	1	2000.00	valide	2026-06-25	2026-06-25 00:05:58.272529	\N	2026-06-25 00:05:37.826884	membre	mix_by_yas
+23	2	5000.00	valide	2026-06-25	2026-06-25 00:54:48.729709	\N	2026-06-25 00:27:34.506223	membre	moov_money
+24	3	1000.00	valide	2026-06-25	2026-06-25 01:17:18.874167	\N	2026-06-25 00:52:32.339531	membre	moov_money
+25	2	5000.00	valide	2026-06-26	2026-06-26 07:35:04.123856	\N	2026-06-26 07:34:18.585342	membre	mix_by_yas
+26	4	2000.00	valide	2026-06-27	2026-06-27 23:29:20.197116	\N	2026-06-27 23:28:33.297047	membre	mix_by_yas
+27	4	0.00	valide	2026-06-28	2026-06-28 00:07:44.894404	\N	2026-06-28 00:07:44.894404	collecteur	\N
+28	4	2000.00	valide	2026-06-29	2026-06-29 15:45:17.803885	\N	2026-06-29 15:43:32.049285	membre	mix_by_yas
+29	1	2000.00	valide	2026-07-03	2026-07-03 10:40:59.019494	\N	2026-07-03 08:47:28.810968	membre	mix_by_yas
+30	3	1000.00	valide	2026-07-03	2026-07-03 10:41:03.861183	\N	2026-07-03 10:41:03.861183	collecteur	\N
 \.
 
 
@@ -379,6 +452,8 @@ COPY public.cotisations (id, membre_id, montant, statut, date_cotisation, heure_
 --
 
 COPY public.demandes_inscription (id, nom_microfinance, ville, telephone, numero_agrement, nom_directeur, prenom_directeur, email_directeur, plan_choisi, statut, created_at) FROM stdin;
+1	CECA	Lomé	92806802	AR-2021 123	BAWA	Abdoul-Madjid	abdoul-Madjid.bawa@ipnetinstitute.com	standard	validee	2026-06-28 20:35:59.866321
+2	CECAV	Lomé	72337535	AV-2001 267	BAWA	Abdoul-Madjid	abdoulmladjidbawa3@gmail.com	premium	en_attente	2026-06-29 16:55:48.473461
 \.
 
 
@@ -387,6 +462,10 @@ COPY public.demandes_inscription (id, nom_microfinance, ville, telephone, numero
 --
 
 COPY public.demandes_retrait (id, membre_id, montant, mode_paiement, statut, motif_rejet, created_at, traite_le) FROM stdin;
+1	1	30000.00	moov_money	validee	\N	2026-06-28 00:00:00	2026-06-29 00:00:00
+2	1	50000.00	mix_by_yas	validee	\N	2026-05-30 00:00:00	2026-05-31 00:00:00
+3	1	40000.00	moov_money	validee	\N	2026-04-29 00:00:00	2026-04-30 00:00:00
+4	1	25000.00	mix_by_yas	rejetee	\N	2026-03-31 00:00:00	2026-04-01 00:00:00
 \.
 
 
@@ -395,7 +474,11 @@ COPY public.demandes_retrait (id, membre_id, montant, mode_paiement, statut, mot
 --
 
 COPY public.engagements_mensuels (id, membre_id, mois, annee, montant_journalier, created_at) FROM stdin;
-1	1	6	2026	5000.00	2026-06-22 23:32:19.748279
+1	1	6	2026	2000.00	2026-06-23 21:38:58.656283
+2	2	6	2026	5000.00	2026-06-23 21:38:58.656283
+3	3	6	2026	1000.00	2026-06-23 21:38:58.656283
+4	4	6	2026	2000.00	2026-06-27 23:28:33.279243
+5	1	7	2026	2000.00	2026-07-03 08:47:28.788198
 \.
 
 
@@ -403,8 +486,11 @@ COPY public.engagements_mensuels (id, membre_id, mois, annee, montant_journalier
 -- Data for Name: membres; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.membres (id, user_id, montant_cotisation, solde, collecteur_id, created_at) FROM stdin;
-1	3	5000.00	15000.00	2	2026-06-06 13:13:48.991802
+COPY public.membres (id, user_id, montant_cotisation, solde, collecteur_id, created_at, adresse, lieu_travail, ville_village, telephone, photo_url, numero_compte) FROM stdin;
+2	4	5000.00	55000.00	2	2026-06-06 22:43:37.62305	\N	\N	\N	\N	\N	\N
+4	17	0.00	0.00	16	2026-06-27 23:27:10.386266	\N	\N	\N	\N	\N	\N
+1	3	2000.00	24000.00	2	2026-06-06 12:59:30.721044	\N	\N	\N	\N	\N	\N
+3	5	1000.00	13000.00	2	2026-06-06 22:43:41.621847	\N	\N	\N	\N	\N	\N
 \.
 
 
@@ -413,7 +499,16 @@ COPY public.membres (id, user_id, montant_cotisation, solde, collecteur_id, crea
 --
 
 COPY public.microfinances (id, nom, ville, telephone, created_at, statut, plan, domaine_email) FROM stdin;
-1	CECAV Fraternité	Lomé	+228 90 00 00 00	2026-06-06 13:13:48.991802	active	standard	cecav
+1	CECAV Fraternit‚	Lom‚	22615709	2026-06-06 12:58:43.298753	active	standard	cecav
+2	CECA	Lomé	92806802	2026-06-28 20:56:11.797307	active	standard	ceca
+\.
+
+
+--
+-- Data for Name: profils_collecteurs; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.profils_collecteurs (id, user_id, lieu_travail_avant, date_naissance, photo_url, cv_url, created_at) FROM stdin;
 \.
 
 
@@ -421,10 +516,28 @@ COPY public.microfinances (id, nom, ville, telephone, created_at, statut, plan, 
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, nom, prenom, email, mot_de_passe, role, microfinance_id, created_at) FROM stdin;
-2	Agent	Collecteur	collecteur@cotipay.tg	$2a$10$K7bE2rT5nM9pQ1wS3dF6gH8jK0lZ2xC4vB5nM7qR9sT1uV3wX5yZ6a	collecteur	1	2026-06-06 13:13:48.991802
-3	Koffi	Membre	membre@cotipay.tg	$2a$10$P4qR6tU8vW0xY2zA4cE6gI8kM0oQ2sU4wY6aC8eG0iK2mN4pQ6rS	membre	1	2026-06-06 13:13:48.991802
-1	Admin	Test	admin@cotipay.tg	$2a$10$K7bE7t5nM9p01wSgF6oP8jHcZxC4v5M6n7P8q9R0s1T2u3V4w5X6y7z	admin	1	2026-06-06 13:13:48.991802
+COPY public.users (id, nom, prenom, email, mot_de_passe, role, microfinance_id, created_at, statut) FROM stdin;
+1	Admin	CotiPay	admin@cotipay.tg	$2b$10$oOXsu1EmoBbPTIfmxbHdG.qFYsko8vTkXvrYT2aeZSzAyr5lU6y7u	admin	1	2026-06-06 12:58:56.339552	active
+2	Kofri	Ali	agent@cotipay.tg	$2b$10$oOXsu1EmoBbPTIfmxbHdG.qFYsko8vTkXvrYT2aeZSzAyr5lU6y7u	collecteur	1	2026-06-06 12:59:06.96699	active
+3	Dossou	Ama	membre@cotipay.tg	$2b$10$oOXsu1EmoBbPTIfmxbHdG.qFYsko8vTkXvrYT2aeZSzAyr5lU6y7u	membre	1	2026-06-06 12:59:19.661065	active
+4	Mensah	Kofi	kofi@cotipay.tg	$2b$10$oOXsu1EmoBbPTIfmxbHdG.qFYsko8vTkXvrYT2aeZSzAyr5lU6y7u	membre	1	2026-06-06 22:43:26.896373	active
+5	Adjoavi	Koffi	adjoavi@cotipay.tg	$2b$10$oOXsu1EmoBbPTIfmxbHdG.qFYsko8vTkXvrYT2aeZSzAyr5lU6y7u	membre	1	2026-06-06 22:43:32.168401	active
+6	vjhb	lnlnlkn	lnlnlkn.vjhb@cecav.cotipay.tg	$2b$10$J2riGKRDlZYETwtFKDH2Ueh/sa8NcJ/eSqZgfv99lZAVqdViOuAha	collecteur	1	2026-06-27 22:25:35.626441	active
+7	TA	ABRro	abrro.ta@cecav.cotipay.tg	$2b$10$AqhvRTujtuB0rrCm44rRcObH.NVaF0QNs/9.Zc7dKfqpQ0jGGodgG	collecteur	1	2026-06-27 22:25:55.420731	active
+8	tjbkjn	kjkhoi	kjkhoi.tjbkjn@cecav.cotipay.tg	$2b$10$jH2jNfmW3puXr105e7Uat.g0rqf7O8ZBTEB88rEbWKH8LTNJnAlPq	collecteur	1	2026-06-27 22:29:40.591449	active
+9	gct	jbkjkn	jbkjkn.gct@cecav.cotipay.tg	$2b$10$0iVDzSLOk40xvRB7Uxx.sewekeLO1nqHyg6tVzIuhFUmqxwPGCoFm	collecteur	1	2026-06-27 22:30:54.421802	active
+10	vvhb	kjjbbh	kjjbbh.vvhb@cecav.cotipay.tg	$2b$10$SIkakLnYmRMGvlZ4w/7dMu3z2kYu6KSY59ei8DRMCCz2rftQGTC/2	collecteur	1	2026-06-27 22:36:20.414879	active
+11	qdsqd	bjby	bjby.qdsqd@cecav.cotipay.tg	$2b$10$K6.Wo5bWTbXy7r4LK8kVBO/q835.PAsEA9E2NE3JH3WF28cqwPSyS	collecteur	1	2026-06-27 22:36:42.579387	active
+12	hvvv	kjkjb	kjkjb.hvvv@cecav.cotipay.tg	$2b$10$5LyfPJqFc74f2eSRqSjMp.PblvfHfI7zk8.AVVOd6nGVMAEqzAjCy	collecteur	1	2026-06-27 22:39:21.53999	active
+13	scgcs	jkjb	jkjb.scgcs@cecav.cotipay.tg	$2b$10$RF0Iz5WWXoYzhH49avFD2us/lnThlvNl0fkRuQDHUw8OuHu0a0PpO	collecteur	1	2026-06-27 22:46:34.907634	active
+14	AB	ABRrO	abrro.ab@cecav.cotipay.tg	$2b$10$sl459zzmvPUWm0MOLeFvU.MBWlDplJXoOLH6JH94M4aRLInYFtM9W	collecteur	1	2026-06-27 23:01:22.415932	active
+15	hj	UI	ui.hj@cecav.cotipay.tg	$2b$10$8Lx6gmoHh8fUsmZxuIhVfuwlGeenchEX0uyJSt9kb.KRpSSTenHbm	collecteur	1	2026-06-27 23:17:21.739044	active
+16	YT	AB	ab.yt@cecav.cotipay.tg	$2b$10$rfEPtx1iBIuYtx1wHiQICuNds6BOwHyyB4AbywK3IpddNyYv94jFa	collecteur	1	2026-06-27 23:24:46.496405	active
+17	pa	Aro	aro.pa@cecav.cotipay.tg	$2b$10$5GWh/FJ7SsIim36xBrUJJOq/tXB4v/rcrE8F7BZ7u4OiIIVoJcTBO	membre	1	2026-06-27 23:27:10.378482	active
+18	CotiPay	SuperAdmin	superadmin@cotipay.tg	$2b$10$hqQwwxLJGhOJzTQekZYoceFI3yyX9u9eKIDKHth6pq4OS6uVj4Gfm	super_admin	\N	2026-06-28 20:48:18.026572	active
+19	BAWA	Abdoul-Madjid	abdoul-madjid.bawa@ceca.cotipay.tg	$2b$10$tMwpHyU2xkqt5fmtIt5OZ.io1UTDmHji5lsa/gsmH7DWkF/v.x5LS	admin	2	2026-06-28 20:56:12.042231	active
+20	ro	ab	ab.ro@cecav.cotipay.tg	$2b$10$qVvfeGHvb5k4O5IkcbTdKeZO21ykZDu0BmKRyiDFBAFjueknN/LzC	collecteur	1	2026-06-29 17:05:31.639435	active
+21	nj	nkn	nkn.nj@cecav.cotipay.tg	$2b$10$SY5nc4e9fhsFm4sb6uCFRekmHuxq9BpnhjOnQa0hbcskgbK68KNfa	collecteur	1	2026-07-03 20:27:29.539637	active
 \.
 
 
@@ -432,49 +545,56 @@ COPY public.users (id, nom, prenom, email, mot_de_passe, role, microfinance_id, 
 -- Name: cotisations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.cotisations_id_seq', 3, true);
+SELECT pg_catalog.setval('public.cotisations_id_seq', 30, true);
 
 
 --
 -- Name: demandes_inscription_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.demandes_inscription_id_seq', 1, false);
+SELECT pg_catalog.setval('public.demandes_inscription_id_seq', 2, true);
 
 
 --
 -- Name: demandes_retrait_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.demandes_retrait_id_seq', 1, false);
+SELECT pg_catalog.setval('public.demandes_retrait_id_seq', 4, true);
 
 
 --
 -- Name: engagements_mensuels_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.engagements_mensuels_id_seq', 1, true);
+SELECT pg_catalog.setval('public.engagements_mensuels_id_seq', 5, true);
 
 
 --
 -- Name: membres_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.membres_id_seq', 1, true);
+SELECT pg_catalog.setval('public.membres_id_seq', 4, true);
 
 
 --
 -- Name: microfinances_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.microfinances_id_seq', 2, true);
+SELECT pg_catalog.setval('public.microfinances_id_seq', 3, true);
+
+
+--
+-- Name: profils_collecteurs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.profils_collecteurs_id_seq', 1, false);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 4, true);
+SELECT pg_catalog.setval('public.users_id_seq', 21, true);
 
 
 --
@@ -518,6 +638,14 @@ ALTER TABLE ONLY public.engagements_mensuels
 
 
 --
+-- Name: membres membres_numero_compte_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.membres
+    ADD CONSTRAINT membres_numero_compte_key UNIQUE (numero_compte);
+
+
+--
 -- Name: membres membres_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -547,6 +675,22 @@ ALTER TABLE ONLY public.microfinances
 
 ALTER TABLE ONLY public.microfinances
     ADD CONSTRAINT microfinances_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: profils_collecteurs profils_collecteurs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.profils_collecteurs
+    ADD CONSTRAINT profils_collecteurs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: profils_collecteurs profils_collecteurs_user_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.profils_collecteurs
+    ADD CONSTRAINT profils_collecteurs_user_id_key UNIQUE (user_id);
 
 
 --
@@ -614,6 +758,14 @@ ALTER TABLE ONLY public.membres
 
 
 --
+-- Name: profils_collecteurs profils_collecteurs_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.profils_collecteurs
+    ADD CONSTRAINT profils_collecteurs_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
 -- Name: users users_microfinance_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -625,5 +777,5 @@ ALTER TABLE ONLY public.users
 -- PostgreSQL database dump complete
 --
 
-\unrestrict nZTdkQlzG0Zy4P8SswakYlSDQ3fAeMGbtmFGW0QDqekBJtWSbMAM5MLXZqXq6QO
+\unrestrict ZtJVJbB7C8yJWhJhSsKs9aInjCQLIaTdPgvoyPRhC7mWU58Dbs8x5Nc7XnKuZXT
 

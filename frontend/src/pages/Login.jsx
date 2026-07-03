@@ -9,8 +9,9 @@ export default function Login() {
   const navigate = useNavigate()
 
   const handleLogin = async () => {
+    setErreur("")
     try {
-  const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, mot_de_passe: motDePasse })
@@ -24,7 +25,7 @@ export default function Login() {
         else if (data.role === "collecteur") navigate("/collecteur")
         else navigate("/membre")
       } else {
-        setErreur(data.message)
+        setErreur(data.message || "Identifiants incorrects")
       }
     } catch (err) {
       setErreur("Erreur de connexion au serveur")
@@ -36,21 +37,16 @@ export default function Login() {
 
       {/* Côté gauche - branding */}
       <div className="hidden lg:flex w-1/2 bg-primary relative overflow-hidden flex-col justify-between p-12">
+        <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary-light/30 rounded-full animate-floatSlow blur-xl" />
+        <div className="absolute bottom-0 -left-10 w-48 h-48 bg-primary-dark/40 rounded-full animate-floatSlowReverse blur-xl" />
 
-        {/* Formes décoratives */}
-        <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary-light/30 rounded-full"/>
-        <div className="absolute bottom-0 -left-10 w-48 h-48 bg-primary-dark/40 rounded-full"/>
-
-        {/* Logo */}
         <div className="flex items-center gap-3 z-10">
-          {/* TODO: remplacer ce cercle par <img src="/logo.svg" className="w-11 h-11" /> */}
           <div className="w-11 h-11 bg-secondary rounded-full flex items-center justify-center">
             <span className="text-primary font-bold text-lg">C</span>
           </div>
           <span className="text-white font-bold text-xl">CotiPay</span>
         </div>
 
-        {/* Accroche */}
         <div className="z-10">
           <h1 className="text-4xl font-bold text-white mb-3 leading-tight">
             La tontine,<br/>enfin digitale.
@@ -58,15 +54,12 @@ export default function Login() {
           <p className="text-primary-light/90 text-sm mb-8">
             Une seule plateforme pour les membres, les collecteurs et les micro-finances.
           </p>
-
-        {/* 3 mini-blocs rôles */}
-        <CarrouselRoles />
+          <CarrouselRoles />
         </div>
 
-        {/* Badge */}
         <div className="z-10">
           <span className="bg-primary-dark text-secondary text-xs px-4 py-2 rounded-full">
-            🇹🇬 
+            🇹🇬 Fait pour le Togo
           </span>
         </div>
       </div>
@@ -118,7 +111,7 @@ export default function Login() {
             </Link>
           </p>
 
-          <p className="text-center text-xs text-muted/60 mt-4">© 2026 CotiPay</p>
+          <p className="text-center text-xs text-muted/60 mt-4">© 2026 CotiPay — Commit & Pray</p>
         </div>
       </div>
 
