@@ -81,11 +81,15 @@ export default function DashboardMembre() {
   }
 
   const confirmerRetrait = async () => {
-    if (!montantRetrait || montantRetrait <= 0 || montantRetrait > solde) {
+    if (!montantRetrait || montantRetrait <= 0) {
       setMessageRetrait("Montant invalide")
       return
     }
-    setEtapeRetrait("choix-paiement")
+    if (!modeRetrait) {
+      setMessageRetrait("Choisissez un mode de paiement")
+      return
+    }
+    setEtapeRetrait("ussd")
   }
 
   const handleConfirmeRetraitUSSD = async () => {
